@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Resources\Statuses;
+namespace App\Http\Resources\Approvers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class StatusResource extends JsonResource
+class ApproverResource extends JsonResource
 {
-    public static $wrap = 'status';
+    public static $wrap = 'approver';
 
     /**
      * Transform the resource into an array.

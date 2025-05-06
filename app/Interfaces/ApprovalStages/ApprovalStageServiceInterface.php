@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Interfaces;
+namespace App\Interfaces\ApprovalStages;
 
-interface StatusServiceInterface
+interface ApprovalStageServiceInterface
 {
     public function findAll();
 

@@ -2,7 +2,7 @@
 
 namespace App\Interfaces;
 
-interface StatusServiceInterface
+interface ApproverServiceInterface
 {
     public function findAll();
 

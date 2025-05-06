@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Interfaces;
+namespace App\Interfaces\ApprovalStages;
 
-interface StatusRepositoryInterface
+interface ApprovalStageRepositoryInterface
 {
     public function getAll();
 

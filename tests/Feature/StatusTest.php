@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Enums\StatusEnum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class StatusTest extends TestCase
@@ -32,7 +31,6 @@ class StatusTest extends TestCase
         $response->assertOk()
             ->assertJsonCount(count: 2, key: 'statuses');
     }
-
 
     public function test_can_get_a_status(): void
     {
@@ -73,7 +71,7 @@ class StatusTest extends TestCase
         $status = $this->createPostThroughApi();
 
         $response = $this->deleteJson(uri: "/api/statuses/{$status['id']}");
-        $response->assertNoContent();
+        $response->assertOk()->assertJson(['status' => null, 'message' => 'Status deleted successfully']);
 
         $this->assertDatabaseMissing(table: 'statuses', data: ['id' => $status['id']]);
     }
