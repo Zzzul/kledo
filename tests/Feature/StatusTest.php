@@ -10,7 +10,7 @@ class StatusTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function createPostThroughApi(array $data = []): array
+    protected function createStatusThroughApi(array $data = []): array
     {
         $payload = array_merge([
             'name' => StatusEnum::MENUNGGU_PERSETUJUAN->value,
@@ -24,8 +24,8 @@ class StatusTest extends TestCase
 
     public function test_can_get_all_statuses(): void
     {
-        $this->createPostThroughApi(data: ['name' => StatusEnum::MENUNGGU_PERSETUJUAN->value]);
-        $this->createPostThroughApi(data: ['name' => StatusEnum::DISETUJUI->value]);
+        $this->createStatusThroughApi(data: ['name' => StatusEnum::MENUNGGU_PERSETUJUAN->value]);
+        $this->createStatusThroughApi(data: ['name' => StatusEnum::DISETUJUI->value]);
 
         $response = $this->getJson(uri: '/api/statuses');
         $response->assertOk()
@@ -34,7 +34,7 @@ class StatusTest extends TestCase
 
     public function test_can_get_a_status(): void
     {
-        $status = $this->createPostThroughApi();
+        $status = $this->createStatusThroughApi();
 
         $response = $this->getJson(uri: "/api/statuses/{$status['id']}");
         $response->assertOk();
@@ -54,7 +54,7 @@ class StatusTest extends TestCase
 
     public function test_can_update_status(): void
     {
-        $status = $this->createPostThroughApi();
+        $status = $this->createStatusThroughApi();
 
         $payload = [
             'name' => StatusEnum::DISETUJUI->value,
@@ -68,7 +68,7 @@ class StatusTest extends TestCase
 
     public function test_can_delete_status(): void
     {
-        $status = $this->createPostThroughApi();
+        $status = $this->createStatusThroughApi();
 
         $response = $this->deleteJson(uri: "/api/statuses/{$status['id']}");
         $response->assertOk()->assertJson(['status' => null, 'message' => 'Status deleted successfully']);

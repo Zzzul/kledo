@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApprovalStageController;
 use App\Http\Controllers\ApproverController;
 use App\Http\Controllers\StatusController;
 use Illuminate\Http\Request;
@@ -11,3 +12,4 @@ Route::get('/user', function (Request $request) {
 
 Route::apiResource('/statuses', StatusController::class);
 Route::apiResource('/approvers', ApproverController::class);
+Route::apiResource('/approval-stages', ApprovalStageController::class);

@@ -2,15 +2,19 @@
 
 namespace App\Providers;
 
-use App\Services\StatusService;
-use App\Services\ApproverService;
-use App\Repositories\StatusRepository;
-use Illuminate\Support\ServiceProvider;
-use App\Repositories\ApproverRepository;
-use App\Interfaces\StatusServiceInterface;
+use App\Interfaces\ApprovalStages\ApprovalStageRepositoryInterface;
+use App\Interfaces\ApprovalStages\ApprovalStageServiceInterface;
+use App\Interfaces\ApproverRepositoryInterface;
 use App\Interfaces\ApproverServiceInterface;
 use App\Interfaces\StatusRepositoryInterface;
-use App\Interfaces\ApproverRepositoryInterface;
+use App\Interfaces\StatusServiceInterface;
+use App\Repositories\ApprovalStageRepository;
+use App\Repositories\ApproverRepository;
+use App\Repositories\StatusRepository;
+use App\Services\ApprovalStageService;
+use App\Services\ApproverService;
+use App\Services\StatusService;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +28,9 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(abstract: ApproverRepositoryInterface::class, concrete: ApproverRepository::class);
         $this->app->bind(abstract: ApproverServiceInterface::class, concrete: ApproverService::class);
+
+        $this->app->bind(abstract: ApprovalStageRepositoryInterface::class, concrete: ApprovalStageRepository::class);
+        $this->app->bind(abstract: ApprovalStageServiceInterface::class, concrete: ApprovalStageService::class);
     }
 
     /**

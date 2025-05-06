@@ -2,11 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Models\Approver;
-use Illuminate\Support\Facades\DB;
 use App\Interfaces\ApproverRepositoryInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\Approver;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class ApproverRepository implements ApproverRepositoryInterface
 {

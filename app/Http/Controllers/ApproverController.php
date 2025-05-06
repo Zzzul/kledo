@@ -28,6 +28,7 @@ class ApproverController extends Controller
      *     path="/api/approvers",
      *     tags={"Approvers"},
      *     summary="Get list of approvers",
+     *
      *     @OA\Response(response=200, description="List of approvers")
      * )
      */
@@ -44,20 +45,27 @@ class ApproverController extends Controller
      *     tags={"Approvers"},
      *     summary="Create a new approver",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"name"},
+     *
      *             @OA\Property(property="name", type="string", example="Ana")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Approver created",
+     *
      *         @OA\JsonContent(
+     *
      *          @OA\Schema(
      *              schema="Post",
      *              required={"id", "name"},
+     *
      *              @OA\Property(property="id", type="integer", example=1),
      *              @OA\Property(property="name", type="string", example="Ina"),
      *           )
@@ -79,12 +87,15 @@ class ApproverController extends Controller
      *     path="/api/approvers/{id}",
      *     tags={"Approvers"},
      *     summary="Get approver by ID",
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Approver found"),
      *     @OA\Response(response=404, description="Approver not found")
      * )
@@ -101,6 +112,7 @@ class ApproverController extends Controller
      *     path="/api/approvers/{id}",
      *     tags={"Approvers"},
      *     summary="Update a approver",
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -108,13 +120,17 @@ class ApproverController extends Controller
      *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"name"},
-     *             @OA\Property(property="name", type="string", example="Updated Name"),
+     *
+     *             @OA\Property(property="name", type="string", example="Budi"),
      *         )
      *     ),
+     *
      *     @OA\Response(response=200, description="Approver updated"),
      *     @OA\Response(response=404, description="Approver not found")
      * )
@@ -131,12 +147,15 @@ class ApproverController extends Controller
      *     path="/api/approvers/{id}",
      *     tags={"Approvers"},
      *     summary="Delete a approver",
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Approver deleted"),
      *     @OA\Response(response=404, description="Approver not found")
      * )

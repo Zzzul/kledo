@@ -2,22 +2,22 @@
 
 namespace App\Repositories;
 
-use App\Models\ApprovalStage;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use App\Interfaces\ApprovalStages\ApprovalStageRepositoryInterface;
+use App\Models\ApprovalStage;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class ApprovalStageRepository implements ApprovalStageRepositoryInterface
 {
     public function getAll(): LengthAwarePaginator
     {
-        return ApprovalStage::paginate();
+        return ApprovalStage::with(relations: ['approver:id,name'])->paginate();
     }
 
     public function getById(string|int $id): Builder|ApprovalStage
     {
-        return ApprovalStage::find(id: $id);
+        return ApprovalStage::with(relations: ['approver:id,name'])->find(id: $id);
     }
 
     public function create(array $data): ApprovalStage
