@@ -2,7 +2,7 @@
 
 namespace App\Interfaces;
 
-interface StatusRepositoryInterface
+interface ApproverRepositoryInterface
 {
     public function getAll();
 

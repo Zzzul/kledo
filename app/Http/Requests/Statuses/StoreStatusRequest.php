@@ -3,8 +3,8 @@
 namespace App\Http\Requests\Statuses;
 
 use App\Enums\StatusEnum;
-use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreStatusRequest extends FormRequest
 {

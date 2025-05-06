@@ -2,22 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
-use App\Interfaces\StatusServiceInterface;
-use Symfony\Component\HttpFoundation\Response;
-use App\Http\Resources\Statuses\StatusResource;
-use App\Http\Resources\Statuses\StatusCollection;
 use App\Http\Requests\Statuses\StoreStatusRequest;
 use App\Http\Requests\Statuses\UpdateStatusRequest;
+use App\Http\Resources\Statuses\StatusCollection;
+use App\Http\Resources\Statuses\StatusResource;
+use App\Interfaces\StatusServiceInterface;
+use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @OA\Tag(
+ *     name="Status",
+ *     description="API Endpoints for managing status"
+ * )
+ */
 class StatusController extends Controller
 {
-    public function __construct(public StatusServiceInterface $statusService){
+    public function __construct(public StatusServiceInterface $statusService)
+    {
         //
     }
 
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/api/statuses",
+     *     tags={"Statuses"},
+     *     summary="Get list of statuses",
+     *     @OA\Response(response=200, description="List of statuses")
+     * )
      */
     public function index(): StatusCollection
     {
@@ -27,17 +39,55 @@ class StatusController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/statuses",
+     *     tags={"Statuses"},
+     *     summary="Create a new status",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string", example="MENUNGGU PERSETUJUAN"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Status created",
+     *         @OA\JsonContent(
+     *          @OA\Schema(
+     *              schema="Post",
+     *              required={"id", "name"},
+     *              @OA\Property(property="id", type="integer", example=1),
+     *              @OA\Property(property="name", type="string", example="DISETUJUI"),
+     *           )
+     *        )
+     *     ),
+     *
+     *     @OA\Response(response=422, description="Validation error")
+     * )
      */
     public function store(StoreStatusRequest $request): JsonResponse
     {
         $status = $this->statusService->save(data: $request->validated());
-        
+
         return (new StatusResource(resource: $status))->response()->setStatusCode(code: Response::HTTP_CREATED);
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/api/statuses/{id}",
+     *     tags={"Statuses"},
+     *     summary="Get status by ID",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Status found"),
+     *     @OA\Response(response=404, description="Status not found")
+     * )
      */
     public function show(string|int $id): StatusResource
     {
@@ -47,7 +97,26 @@ class StatusController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/statuses/{id}",
+     *     tags={"Statuses"},
+     *     summary="Update a status",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string", example="Updated Title"),
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Status updated"),
+     *     @OA\Response(response=404, description="Status not found")
+     * )
      */
     public function update(UpdateStatusRequest $request, string|int $id): StatusResource
     {
@@ -57,12 +126,24 @@ class StatusController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/statuses/{id}",
+     *     tags={"Statuses"},
+     *     summary="Delete a status",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Status deleted"),
+     *     @OA\Response(response=404, description="Status not found")
+     * )
      */
-    public function destroy(string|int $id): JsonResponse
+    public function destroy(string|int $id): StatusResource
     {
         $this->statusService->delete(id: $id);
 
-        return (new StatusResource(resource: null))->response()->setStatusCode(code: Response::HTTP_NO_CONTENT);
+        return (new StatusResource(resource: null))->additional(['message' => 'Status deleted successfully']);
     }
 }

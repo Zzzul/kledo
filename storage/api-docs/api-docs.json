@@ -1,0 +1,328 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "PT. Kledo Berhati Nyaman",
+        "description": "Back End Assessment V",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/approvers": {
+            "get": {
+                "tags": [
+                    "Approvers"
+                ],
+                "summary": "Get list of approvers",
+                "operationId": "586a005e8bd9637c300f2b4990c7e37f",
+                "responses": {
+                    "200": {
+                        "description": "List of approvers"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Approvers"
+                ],
+                "summary": "Create a new approver",
+                "operationId": "8fddc9e935853028d340f48240c4f3ef",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Approver Example"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Approver created",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/approvers/{id}": {
+            "get": {
+                "tags": [
+                    "Approvers"
+                ],
+                "summary": "Get approver by ID",
+                "operationId": "51e98d7bfb860d57eb5d5ec4ad6bb1c8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Approver found"
+                    },
+                    "404": {
+                        "description": "Approver not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Approvers"
+                ],
+                "summary": "Update a approver",
+                "operationId": "a87026aac3be4b0b6c6496da09b30351",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Updated Name"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Approver updated"
+                    },
+                    "404": {
+                        "description": "Approver not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Approvers"
+                ],
+                "summary": "Delete a approver",
+                "operationId": "cbf7a20cdcab3afd8e45b27ae07223dc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Approver deleted"
+                    },
+                    "404": {
+                        "description": "Approver not found"
+                    }
+                }
+            }
+        },
+        "/api/statuses": {
+            "get": {
+                "tags": [
+                    "Statuses"
+                ],
+                "summary": "Get list of statuses",
+                "operationId": "e96ea40c6f497546795df9ec612e1928",
+                "responses": {
+                    "200": {
+                        "description": "List of statuses"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Statuses"
+                ],
+                "summary": "Create a new status",
+                "operationId": "85739a0412fc324e86e6b45af20c7f0c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Status Example"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Status created",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/statuses/{id}": {
+            "get": {
+                "tags": [
+                    "Statuses"
+                ],
+                "summary": "Get status by ID",
+                "operationId": "ea554faff3dfcadd142b14010e8b3331",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status found"
+                    },
+                    "404": {
+                        "description": "Status not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Statuses"
+                ],
+                "summary": "Update a status",
+                "operationId": "7ba406b9e828f2ce3a0583d7c56583f6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Updated Title"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Status updated"
+                    },
+                    "404": {
+                        "description": "Status not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Statuses"
+                ],
+                "summary": "Delete a status",
+                "operationId": "4bcdd7d14d0707a62e62d2315c6149e7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status deleted"
+                    },
+                    "404": {
+                        "description": "Status not found"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Approvers",
+            "description": "Approvers"
+        },
+        {
+            "name": "Statuses",
+            "description": "Statuses"
+        }
+    ]
+}

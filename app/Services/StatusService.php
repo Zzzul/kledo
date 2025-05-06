@@ -7,27 +7,33 @@ use App\Interfaces\StatusServiceInterface;
 
 class StatusService implements StatusServiceInterface
 {
-    public function __construct(public StatusRepositoryInterface $statusRepository) {
+    public function __construct(public StatusRepositoryInterface $statusRepository)
+    {
         //
     }
 
-    public function findAll() {
+    public function findAll()
+    {
         return $this->statusRepository->getAll();
     }
 
-    public function findById(string|int $id) {
+    public function findById(string|int $id)
+    {
         return $this->statusRepository->getById($id);
     }
 
-    public function save(array $data) {
+    public function save(array $data)
+    {
         return $this->statusRepository->create($data);
     }
 
-    public function update(string|int $id, array $data) {
+    public function update(string|int $id, array $data)
+    {
         return $this->statusRepository->update($id, $data);
     }
 
-    public function delete(string|int $id) {
+    public function delete(string|int $id)
+    {
         return $this->statusRepository->delete($id);
     }
 }
