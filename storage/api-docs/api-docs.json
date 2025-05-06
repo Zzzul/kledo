@@ -6,6 +6,155 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/approval-stages": {
+            "get": {
+                "tags": [
+                    "Approval Stages"
+                ],
+                "summary": "Get list of approval stages",
+                "operationId": "042d956a9fad73e84de890d02a0a497c",
+                "responses": {
+                    "200": {
+                        "description": "List of approval stages"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Approval Stages"
+                ],
+                "summary": "Create a new approval stage",
+                "operationId": "52989e6a14178a727bcc848e3acf8044",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "approver_id"
+                                ],
+                                "properties": {
+                                    "approver_id": {
+                                        "type": "integer",
+                                        "example": "1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Approval stage created",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/approval-stages/{id}": {
+            "get": {
+                "tags": [
+                    "Approval Stages"
+                ],
+                "summary": "Get approval stage by ID",
+                "operationId": "137797aba6dbe900b5ea3f2f12554c74",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Approval stage found"
+                    },
+                    "404": {
+                        "description": "Approval stage not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Approval Stages"
+                ],
+                "summary": "Update a approval stage",
+                "operationId": "09e3ea8a8b87944defd865cd349851f9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "approver_id"
+                                ],
+                                "properties": {
+                                    "approver_id": {
+                                        "type": "integer",
+                                        "example": "1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Approval stage updated"
+                    },
+                    "404": {
+                        "description": "Approval stage not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Approval Stages"
+                ],
+                "summary": "Delete a approval stage",
+                "operationId": "7af9b0a6b398e3d4166fa6380f3239ba",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Approval stage deleted"
+                    },
+                    "404": {
+                        "description": "Approval stage not found"
+                    }
+                }
+            }
+        },
         "/api/approvers": {
             "get": {
                 "tags": [
@@ -36,7 +185,7 @@
                                 "properties": {
                                     "name": {
                                         "type": "string",
-                                        "example": "Approver Example"
+                                        "example": "Ana"
                                     }
                                 },
                                 "type": "object"
@@ -190,7 +339,7 @@
                                 "properties": {
                                     "name": {
                                         "type": "string",
-                                        "example": "Status Example"
+                                        "example": "MENUNGGU PERSETUJUAN"
                                     }
                                 },
                                 "type": "object"
@@ -316,6 +465,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Approval Stages",
+            "description": "Approval Stages"
+        },
         {
             "name": "Approvers",
             "description": "Approvers"

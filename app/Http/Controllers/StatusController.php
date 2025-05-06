@@ -28,6 +28,7 @@ class StatusController extends Controller
      *     path="/api/statuses",
      *     tags={"Statuses"},
      *     summary="Get list of statuses",
+     *
      *     @OA\Response(response=200, description="List of statuses")
      * )
      */
@@ -44,20 +45,27 @@ class StatusController extends Controller
      *     tags={"Statuses"},
      *     summary="Create a new status",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"name"},
+     *
      *             @OA\Property(property="name", type="string", example="MENUNGGU PERSETUJUAN"),
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Status created",
+     *
      *         @OA\JsonContent(
+     *
      *          @OA\Schema(
      *              schema="Post",
      *              required={"id", "name"},
+     *
      *              @OA\Property(property="id", type="integer", example=1),
      *              @OA\Property(property="name", type="string", example="DISETUJUI"),
      *           )
@@ -79,12 +87,15 @@ class StatusController extends Controller
      *     path="/api/statuses/{id}",
      *     tags={"Statuses"},
      *     summary="Get status by ID",
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Status found"),
      *     @OA\Response(response=404, description="Status not found")
      * )
@@ -101,19 +112,25 @@ class StatusController extends Controller
      *     path="/api/statuses/{id}",
      *     tags={"Statuses"},
      *     summary="Update a status",
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"name"},
+     *
      *             @OA\Property(property="name", type="string", example="Updated Title"),
      *         )
      *     ),
+     *
      *     @OA\Response(response=200, description="Status updated"),
      *     @OA\Response(response=404, description="Status not found")
      * )
@@ -130,12 +147,15 @@ class StatusController extends Controller
      *     path="/api/statuses/{id}",
      *     tags={"Statuses"},
      *     summary="Delete a status",
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Status deleted"),
      *     @OA\Response(response=404, description="Status not found")
      * )

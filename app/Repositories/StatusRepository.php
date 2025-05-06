@@ -2,11 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Models\Status;
-use Illuminate\Support\Facades\DB;
 use App\Interfaces\StatusRepositoryInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\Status;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class StatusRepository implements StatusRepositoryInterface
 {

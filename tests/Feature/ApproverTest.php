@@ -10,7 +10,7 @@ class ApproverTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function createPostThroughApi(array $data = []): array
+    protected function createApproverThroughApi(array $data = []): array
     {
         $payload = array_merge([
             'name' => 'Ana',
@@ -24,8 +24,8 @@ class ApproverTest extends TestCase
 
     public function test_can_get_all_approvers(): void
     {
-        $this->createPostThroughApi(data: ['name' => 'Ana']);
-        $this->createPostThroughApi(data: ['name' => 'Ani']);
+        $this->createApproverThroughApi(data: ['name' => 'Ana']);
+        $this->createApproverThroughApi(data: ['name' => 'Ani']);
 
         $response = $this->getJson(uri: '/api/approvers');
         $response->assertOk()->assertJsonCount(count: 2, key: 'approvers');
@@ -33,7 +33,7 @@ class ApproverTest extends TestCase
 
     public function test_can_get_a_approver(): void
     {
-        $approver = $this->createPostThroughApi();
+        $approver = $this->createApproverThroughApi();
 
         $response = $this->getJson(uri: "/api/approvers/{$approver['id']}");
         $response->assertOk();
@@ -53,7 +53,7 @@ class ApproverTest extends TestCase
 
     public function test_can_update_approver(): void
     {
-        $approver = $this->createPostThroughApi();
+        $approver = $this->createApproverThroughApi();
 
         $payload = [
             'name' => 'Ani',
@@ -67,7 +67,7 @@ class ApproverTest extends TestCase
 
     public function test_can_delete_approver(): void
     {
-        $approver = $this->createPostThroughApi();
+        $approver = $this->createApproverThroughApi();
 
         $response = $this->deleteJson(uri: "/api/approvers/{$approver['id']}");
         $response->assertOk()->assertJson(value: ['approver' => null, 'message' => 'Approver deleted successfully']);
@@ -75,18 +75,20 @@ class ApproverTest extends TestCase
         $this->assertDatabaseMissing(table: 'approvers', data: ['id' => $approver['id']]);
     }
 
-    public function test_cant_create_with_same_name(): void{
-      $this->createPostThroughApi(data: ['name' => 'Ana']);
+    public function test_cant_create_with_same_name(): void
+    {
+        $this->createApproverThroughApi(data: ['name' => 'Ana']);
 
-      $response = $this->postJson(uri: '/api/approvers', data: ['name' => 'Ana']);
-      $response->assertStatus(status: Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response = $this->postJson(uri: '/api/approvers', data: ['name' => 'Ana']);
+        $response->assertStatus(status: Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
-    public function test_cant_update_with_same_name(): void{
-        $this->createPostThroughApi(data: ['name' => 'Ani']);
-        $approver = $this->createPostThroughApi(data: ['name' => 'Ana']);
-  
+    public function test_cant_update_with_same_name(): void
+    {
+        $this->createApproverThroughApi(data: ['name' => 'Ani']);
+        $approver = $this->createApproverThroughApi(data: ['name' => 'Ana']);
+
         $response = $this->putJson(uri: "/api/approvers/{$approver['id']}", data: ['name' => 'Ani']);
         $response->assertStatus(status: Response::HTTP_UNPROCESSABLE_ENTITY);
-      }
+    }
 }
