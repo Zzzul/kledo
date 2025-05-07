@@ -62,7 +62,7 @@ class ApprovalStageController extends Controller
      *         @OA\JsonContent(
      *
      *          @OA\Schema(
-     *              schema="Post",
+     *              schema="ApprovalStage",
      *              required={"id", "name"},
      *
      *              @OA\Property(property="id", type="integer", example="1"),

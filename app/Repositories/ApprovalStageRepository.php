@@ -48,4 +48,9 @@ class ApprovalStageRepository implements ApprovalStageRepositoryInterface
             return true;
         });
     }
+
+    public function countAll(): int
+    {
+        return ApprovalStage::count();
+    }
 }

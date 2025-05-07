@@ -10,18 +10,6 @@ class ApproverTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function createApproverThroughApi(array $data = []): array
-    {
-        $payload = array_merge([
-            'name' => 'Ana',
-        ], $data);
-
-        $response = $this->postJson(uri: '/api/approvers', data: $payload);
-        $response->assertCreated();
-
-        return $response->json(key: 'approver');
-    }
-
     public function test_can_get_all_approvers(): void
     {
         $this->createApproverThroughApi(data: ['name' => 'Ana']);

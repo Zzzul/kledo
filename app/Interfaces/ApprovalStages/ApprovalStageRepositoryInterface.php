@@ -13,4 +13,6 @@ interface ApprovalStageRepositoryInterface
     public function update(string|int $id, array $data);
 
     public function delete(string|int $id);
+
+    public function countAll();
 }

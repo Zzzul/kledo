@@ -63,7 +63,7 @@ class StatusController extends Controller
      *         @OA\JsonContent(
      *
      *          @OA\Schema(
-     *              schema="Post",
+     *              schema="Status",
      *              required={"id", "name"},
      *
      *              @OA\Property(property="id", type="integer", example=1),

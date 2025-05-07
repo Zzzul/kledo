@@ -10,33 +10,6 @@ class ApprovalStageTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function createApprovalStageThroughApi(array $data = []): array
-    {
-        $this->createApproverThroughApi(data: ['name' => 'Ani']);
-        $this->createApproverThroughApi(data: ['name' => 'Ina']);
-
-        $payload = array_merge([
-            'approver_id' => 1,
-        ], $data);
-
-        $response = $this->postJson(uri: '/api/approval-stages', data: $payload);
-        $response->assertCreated();
-
-        return $response->json(key: 'approval_stage');
-    }
-
-    protected function createApproverThroughApi(array $data = []): array
-    {
-        $payload = array_merge([
-            'name' => 'Ana',
-        ], $data);
-
-        $response = $this->postJson(uri: '/api/approvers', data: $payload);
-        $response->assertCreated();
-
-        return $response->json(key: 'approver');
-    }
-
     public function test_can_get_all_approval_stages(): void
     {
         $this->createApprovalStageThroughApi(data: ['approver_id' => 1]);
@@ -67,6 +40,26 @@ class ApprovalStageTest extends TestCase
         $response->assertCreated();
 
         $this->assertDatabaseHas(table: 'approval_stages', data: $payload);
+    }
+
+    public function test_approver_id_is_required(): void
+    {
+        $payload = [
+            'approver_id' => null,
+        ];
+
+        $response = $this->postJson(uri: '/api/approval-stages', data: $payload);
+        $response->assertStatus(status: Response::HTTP_UNPROCESSABLE_ENTITY)->assertJsonValidationErrors(['approver_id']);
+    }
+
+    public function test_cant_create_approval_stages_because_approver_id_is_not_exist_in_database(): void
+    {
+        $payload = [
+            'approver_id' => 99,
+        ];
+
+        $response = $this->postJson(uri: '/api/approval-stages', data: $payload);
+        $response->assertStatus(status: Response::HTTP_UNPROCESSABLE_ENTITY)->assertJsonValidationErrors(['approver_id']);
     }
 
     public function test_can_update_approval_stage(): void

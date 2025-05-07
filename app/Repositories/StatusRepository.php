@@ -20,6 +20,11 @@ class StatusRepository implements StatusRepositoryInterface
         return Status::find(id: $id);
     }
 
+    public function getByName(string $name): Builder|Status|null
+    {
+        return Status::where(column: 'name', operator: '=', value: $name)->first();
+    }
+
     public function create(array $data): Status
     {
         return DB::transaction(callback: function () use ($data): Status {
