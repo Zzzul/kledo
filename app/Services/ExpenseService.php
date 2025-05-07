@@ -114,8 +114,6 @@ class ExpenseService implements ExpenseServiceInterface
             return $approval->status_id === $approvedStatusId;
         });
 
-        info('isAllApproved: '.$isAllApproved);
-
         if ($isAllApproved) {
             $this->expenseRepository->update(id: $expenseId, data: [
                 'status_id' => $approvedStatusId,
@@ -123,7 +121,7 @@ class ExpenseService implements ExpenseServiceInterface
             ]);
         }
 
-        return $expense;
+        return $this->expenseRepository->getById(id: $expenseId);
     }
 
     public function checkIfExpenseHasApprovals(string|int $id)
