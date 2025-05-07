@@ -2,18 +2,19 @@
 
 namespace App\Repositories;
 
-use App\Models\Expense;
+use App\Enums\StatusEnum;
+use App\Interfaces\Approvals\ApprovalRepositoryInterface;
+use App\Interfaces\Expenses\ExpenseRepositoryInterface;
+use App\Interfaces\StatusRepositoryInterface;
 use App\Models\Approval;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use App\Models\Expense;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
-use App\Interfaces\Expenses\ExpenseRepositoryInterface;
-use App\Interfaces\Approvals\ApprovalRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
 class ExpenseRepository implements ExpenseRepositoryInterface
 {
-    public function __construct(public ApprovalRepositoryInterface $approvalRepository)
+    public function __construct(public ApprovalRepositoryInterface $approvalRepository, public StatusRepositoryInterface $statusRepository)
     {
         //
     }
@@ -30,13 +31,13 @@ class ExpenseRepository implements ExpenseRepositoryInterface
 
     public function create(array $data): Expense
     {
-        Log::debug('data', $data);
-
         return DB::transaction(callback: function () use ($data): Expense {
             $expense = Expense::create(attributes: [
                 'amount' => $data['amount'],
-                'status_id' => $data['status_id'],
+                'status_id' => $this->statusRepository->getByName(name: StatusEnum::MENUNGGU_PERSETUJUAN->value)->id,
             ]);
+
+            info('expense create', [$expense]);
 
             return $expense;
         });
@@ -46,6 +47,14 @@ class ExpenseRepository implements ExpenseRepositoryInterface
     {
         return DB::transaction(callback: function () use ($id, $data): Expense|Builder {
             $expense = $this->getById(id: $id);
+            $approvedStatusId = $this->statusRepository->getByName(name: StatusEnum::MENUNGGU_PERSETUJUAN->value)->id;
+
+            if ($approvedStatusId != $expense->status_id) {
+                $data['status_id'] = $this->statusRepository->getByName(name: StatusEnum::MENUNGGU_PERSETUJUAN->value)->id;
+            } else {
+                $data['status_id'] = $this->statusRepository->getByName(name: StatusEnum::DISETUJUI->value)->id;
+            }
+
             $expense->update([
                 'amount' => $data['amount'],
                 'status_id' => $data['status_id'],
@@ -59,6 +68,7 @@ class ExpenseRepository implements ExpenseRepositoryInterface
     {
         return DB::transaction(callback: function () use ($id): bool {
             $expense = $this->getById(id: $id);
+            $expense->approvals()->delete();
             $expense->delete();
 
             return true;

@@ -8,7 +8,6 @@ use App\Interfaces\ApprovalStages\ApprovalStageRepositoryInterface;
 use App\Interfaces\Expenses\ExpenseRepositoryInterface;
 use App\Interfaces\Expenses\ExpenseServiceInterface;
 use App\Interfaces\StatusRepositoryInterface;
-use Exception;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -40,6 +39,8 @@ class ExpenseService implements ExpenseServiceInterface
         $expense = $this->expenseRepository->create($data);
 
         $this->createExpenseApprovalsByApprovalStages(expenseId: $expense->id, data: $data);
+
+        return $expense;
     }
 
     public function update(string|int $id, array $data)
@@ -56,16 +57,16 @@ class ExpenseService implements ExpenseServiceInterface
     {
         $expense = $this->expenseRepository->getById(id: $expenseId);
 
-        if (!$this->checkIfExpenseHasApprovals(id: $expenseId)) {
+        if (! $this->checkIfExpenseHasApprovals(id: $expenseId)) {
             $expenseApprovalsCreated = $this->createExpenseApprovalsByApprovalStages(expenseId: $expenseId, data: [
                 'status_id' => $this->statusRepository->getByName(name: StatusEnum::MENUNGGU_PERSETUJUAN->value)->id,
                 'approver_id' => $approverId,
                 'expense_id' => $expenseId,
             ]);
 
-            if (!$expenseApprovalsCreated) {
+            if (! $expenseApprovalsCreated) {
                 throw new HttpResponseException(response()->json([
-                    'message' => 'Approval stage not found.'
+                    'message' => 'Approval stage not found.',
                 ], Response::HTTP_NOT_FOUND));
             }
 
@@ -80,42 +81,40 @@ class ExpenseService implements ExpenseServiceInterface
 
         if ($currentApprovalIndex === false) {
             throw new HttpResponseException(response()->json([
-                'message' => 'Approval not found for this approver.'
+                'message' => 'Approval not found for this approver.',
             ], Response::HTTP_NOT_FOUND));
         }
 
         $currentApproval = $approvals[$currentApprovalIndex];
         $approvedStatusId = $this->statusRepository->getByName(name: StatusEnum::DISETUJUI->value)->id;
 
-        // ✅ Tambahan validasi: jika sudah disetujui, return error
         if ($currentApproval->status_id === $approvedStatusId) {
             throw new HttpResponseException(response()->json([
-                'message' => 'This approval has already been approved.'
+                'message' => 'This approval has already been approved.',
             ], Response::HTTP_UNPROCESSABLE_ENTITY));
         }
 
-        // ✅ Validasi urutan approval
         for ($i = 0; $i < $currentApprovalIndex; $i++) {
             if ($approvals[$i]->status_id !== $approvedStatusId) {
                 throw new HttpResponseException(response()->json([
-                    'message' => 'You cannot approve this expense before previous approvals are completed.'
+                    'message' => 'You cannot approve this expense before previous approvals are completed.',
                 ], Response::HTTP_UNPROCESSABLE_ENTITY));
             }
         }
 
-        // ✅ Update status approval
         $this->expenseRepository->updateApprovalStatus(
             approverId: $approverId,
             statusId: $approvedStatusId
         );
 
-        // ✅ Update status expense jika semua approval sudah disetujui
         $expense = $this->expenseRepository->getById(id: $expenseId);
         $approvals = $expense->approvals;
 
         $isAllApproved = $approvals->every(function ($approval) use ($approvedStatusId) {
             return $approval->status_id === $approvedStatusId;
         });
+
+        info('isAllApproved: '.$isAllApproved);
 
         if ($isAllApproved) {
             $this->expenseRepository->update(id: $expenseId, data: [
@@ -126,7 +125,6 @@ class ExpenseService implements ExpenseServiceInterface
 
         return $expense;
     }
-
 
     public function checkIfExpenseHasApprovals(string|int $id)
     {

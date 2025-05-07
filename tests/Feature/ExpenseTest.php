@@ -36,6 +36,8 @@ class ExpenseTest extends TestCase
         $response = $this->postJson(uri: '/api/expenses', data: $payload);
         $response->assertCreated();
 
+        info('resp', [$response->json()]);
+
         return $response->json(key: 'expense');
     }
 
@@ -49,9 +51,11 @@ class ExpenseTest extends TestCase
         $this->withOutExceptionHandling();
     }
 
-    public function test_can_get_a_expense(): void
+    public function test_can_get_expense_by_id(): void
     {
         $expense = $this->createExpenseThroughApi();
+
+        info('expense', [$expense]);
 
         $response = $this->getJson(uri: "/api/expenses/{$expense['id']}");
         $response->assertOk();
@@ -132,11 +136,28 @@ class ExpenseTest extends TestCase
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)->assertJsonValidationErrors(['amount']);
     }
 
-    public function test_all_approver_approved_from_three_approvals(): void {}
+    public function test_all_approver_approved_from_three_approvals(): void
+    {
+        // TODO
+    }
 
-    public function test_only_two_approver_approved_from_three_approvals(): void {}
+    public function test_only_two_approver_approved_from_three_approvals(): void
+    {
+        // TODO
+    }
 
-    public function test_only_one_approver_approved_from_three_approvals(): void {}
+    public function test_only_one_approver_approved_from_three_approvals(): void
+    {
+        // TODO
+    }
 
-    public function test_all_approver_not_approved_from_three_approvals(): void {}
+    public function test_all_approver_not_approved_from_three_approvals(): void
+    {
+        // TODO
+    }
+
+    public function test_approver_cannot_approve_twice(): void
+    {
+        // TODO
+    }
 }

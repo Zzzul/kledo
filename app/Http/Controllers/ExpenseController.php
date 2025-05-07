@@ -168,7 +168,7 @@ class ExpenseController extends Controller
     }
 
     /**
-     * @OA\Delete(
+     * @OA\Patch(
      *     path="/api/expenses/{id}/approve",
      *     tags={"Expenses"},
      *     summary="Approve a expense",
@@ -181,9 +181,19 @@ class ExpenseController extends Controller
      *         @OA\Schema(type="integer")
      *     ),
      *
-     *     @OA\Response(response=200, description="Expense deleted"),
-     *     @OA\Response(response=404, description="Expense not found")
-     *     @OA\Response(response=422, description="Validation error")
+     *     @OA\RequestBody(
+     *         required=true,
+     *
+     *         @OA\JsonContent(
+     *             required={"approver_id"},
+     *
+     *             @OA\Property(property="approver_id", type="number", example="1"),
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response=200, description="Expense updated"),
+     *     @OA\Response(response=404, description="Expense not found"),
+     *     @OA\Response(response=422, description="Validation error"),
      * )
      */
     public function approve(string|int $id, ApproveExpenseRequest $request): ExpenseResource
