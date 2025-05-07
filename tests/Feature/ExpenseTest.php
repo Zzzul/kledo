@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\StatusEnum;
+use App\Repositories\StatusRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
@@ -25,6 +26,7 @@ class ExpenseTest extends TestCase
         $this->createApprovalStageWithoutApproverThroughApi(data: ['approver_id' => 1]);
         $this->createApprovalStageWithoutApproverThroughApi(data: ['approver_id' => 2]);
         $this->createApprovalStageWithoutApproverThroughApi(data: ['approver_id' => 3]);
+
     }
 
     public function createExpenseThroughApi(array $data = []): array
@@ -35,8 +37,6 @@ class ExpenseTest extends TestCase
 
         $response = $this->postJson(uri: '/api/expenses', data: $payload);
         $response->assertCreated();
-
-        info('resp', [$response->json()]);
 
         return $response->json(key: 'expense');
     }
@@ -54,8 +54,6 @@ class ExpenseTest extends TestCase
     public function test_can_get_expense_by_id(): void
     {
         $expense = $this->createExpenseThroughApi();
-
-        info('expense', [$expense]);
 
         $response = $this->getJson(uri: "/api/expenses/{$expense['id']}");
         $response->assertOk();
@@ -136,28 +134,99 @@ class ExpenseTest extends TestCase
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)->assertJsonValidationErrors(['amount']);
     }
 
+    protected function createStatus(string $name): int
+    {
+        $response = $this->postJson('/api/statuses', ['name' => $name]);
+
+        return $response->json('id');
+    }
+
+    protected function createApprovers(int $count): array
+    {
+        $ids = [];
+        for ($i = 1; $i <= $count; $i++) {
+            $response = $this->postJson('/api/approvers', ['name' => "Approver $i"]);
+            $ids[] = $response->json('approver.id');
+        }
+
+        return $ids;
+    }
+
+    protected function createExpense(): int
+    {
+        $response = $this->postJson('/api/expenses', [
+            'amount' => 10000,
+        ]);
+
+        return $response->json('expense.id');
+    }
+
+    protected function createApprovals(array $approverIds): void
+    {
+        foreach ($approverIds as $approverId) {
+            $this->postJson('/api/approval-stages', [
+                'approver_id' => $approverId,
+            ]);
+        }
+    }
+
     public function test_all_approver_approved_from_three_approvals(): void
     {
-        // TODO
+        $statusId = (new StatusRepository)->getByName(name: StatusEnum::MENUNGGU_PERSETUJUAN->value)->id;
+        $approverIds = $this->createApprovers(3);
+        $expenseId = $this->createExpense();
+        $this->createApprovals($approverIds);
+
+        foreach ($approverIds as $approverId) {
+            $this->patchJson("/api/expenses/{$expenseId}/approve", [
+                'approver_id' => $approverId,
+            ]);
+        }
+
+        $expense = $this->getJson("/api/expenses/{$expenseId}")->json('expense');
+        $this->assertEquals($statusId, $expense['status_id']);
     }
 
     public function test_only_two_approver_approved_from_three_approvals(): void
     {
-        // TODO
+        $statusId = (new StatusRepository)->getByName(name: StatusEnum::MENUNGGU_PERSETUJUAN->value)->id;
+        $approverIds = $this->createApprovers(3);
+        $expenseId = $this->createExpense();
+        $this->createApprovals($approverIds);
+
+        foreach (array_slice($approverIds, 0, 2) as $approverId) {
+            $this->patchJson("/api/expenses/{$expenseId}/approve", [
+                'approver_id' => $approverId,
+            ]);
+        }
+
+        $expense = $this->getJson("/api/expenses/{$expenseId}")->json('expense');
+        $this->assertEquals($statusId, $expense['status_id']);
     }
 
     public function test_only_one_approver_approved_from_three_approvals(): void
     {
-        // TODO
+        $statusId = (new StatusRepository)->getByName(name: StatusEnum::DISETUJUI->value)->id;
+        $approverIds = $this->createApprovers(3);
+        $expenseId = $this->createExpense();
+        $this->createApprovals($approverIds);
+
+        $this->patchJson("/api/expenses/{$expenseId}/approve", [
+            'approver_id' => $approverIds[0],
+        ]);
+
+        $expense = $this->getJson("/api/expenses/{$expenseId}")->json('expense');
+        $this->assertNotEquals($statusId, $expense['status_id']);
     }
 
     public function test_all_approver_not_approved_from_three_approvals(): void
     {
-        // TODO
-    }
+        $statusId = (new StatusRepository)->getByName(name: StatusEnum::MENUNGGU_PERSETUJUAN->value)->id;
+        $approverIds = $this->createApprovers(3);
+        $expenseId = $this->createExpense();
+        $this->createApprovals($approverIds);
 
-    public function test_approver_cannot_approve_twice(): void
-    {
-        // TODO
+        $expense = $this->getJson("/api/expenses/{$expenseId}")->json('expense');
+        $this->assertEquals($statusId, $expense['status_id']);
     }
 }

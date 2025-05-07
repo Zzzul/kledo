@@ -37,8 +37,6 @@ class ExpenseRepository implements ExpenseRepositoryInterface
                 'status_id' => $this->statusRepository->getByName(name: StatusEnum::MENUNGGU_PERSETUJUAN->value)->id,
             ]);
 
-            info('expense create', [$expense]);
-
             return $expense;
         });
     }
