@@ -10,18 +10,6 @@ class StatusTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function createStatusThroughApi(array $data = []): array
-    {
-        $payload = array_merge([
-            'name' => StatusEnum::MENUNGGU_PERSETUJUAN->value,
-        ], $data);
-
-        $response = $this->postJson(uri: '/api/statuses', data: $payload);
-        $response->assertCreated();
-
-        return $response->json(key: 'status');
-    }
-
     public function test_can_get_all_statuses(): void
     {
         $this->createStatusThroughApi(data: ['name' => StatusEnum::MENUNGGU_PERSETUJUAN->value]);

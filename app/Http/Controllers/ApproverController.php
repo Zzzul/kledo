@@ -63,7 +63,7 @@ class ApproverController extends Controller
      *         @OA\JsonContent(
      *
      *          @OA\Schema(
-     *              schema="Post",
+     *              schema="Approver",
      *              required={"id", "name"},
      *
      *              @OA\Property(property="id", type="integer", example=1),
