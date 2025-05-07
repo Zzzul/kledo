@@ -158,6 +158,8 @@ class ExpenseTest extends TestCase
             'amount' => 10000,
         ]);
 
+        info('expense.id', $response->json('expense'));
+
         return $response->json('expense.id');
     }
 
@@ -173,50 +175,68 @@ class ExpenseTest extends TestCase
     public function test_all_approver_approved_from_three_approvals(): void
     {
         $statusId = (new StatusRepository)->getByName(name: StatusEnum::MENUNGGU_PERSETUJUAN->value)->id;
-        $approverIds = $this->createApprovers(3);
-        $expenseId = $this->createExpense();
-        $this->createApprovals($approverIds);
+        $this->createApprovers(3);
 
-        foreach ($approverIds as $approverId) {
+        $expenseId = $this->createExpense();
+        $expenseApprovals = $this->getJson("/api/expenses/{$expenseId}")->json('expense.approvals');
+
+        foreach ($expenseApprovals as $expenseApproval) {
             $this->patchJson("/api/expenses/{$expenseId}/approve", [
-                'approver_id' => $approverId,
-            ]);
+                'approver_id' => $expenseApproval['approver_id'],
+            ])->assertOk();
         }
 
         $expense = $this->getJson("/api/expenses/{$expenseId}")->json('expense');
-        $this->assertEquals($statusId, $expense['status_id']);
+
+        $this->assertNotEquals($statusId, $expense['status_id']);
+        $this->assertNotEquals($statusId, $expense['approvals'][0]['status_id']);
+        $this->assertNotEquals($statusId, $expense['approvals'][1]['status_id']);
+        $this->assertNotEquals($statusId, $expense['approvals'][2]['status_id']);
     }
 
     public function test_only_two_approver_approved_from_three_approvals(): void
     {
         $statusId = (new StatusRepository)->getByName(name: StatusEnum::MENUNGGU_PERSETUJUAN->value)->id;
-        $approverIds = $this->createApprovers(3);
-        $expenseId = $this->createExpense();
-        $this->createApprovals($approverIds);
+        $this->createApprovers(3);
 
-        foreach (array_slice($approverIds, 0, 2) as $approverId) {
+        $expenseId = $this->createExpense();
+        $expenseApprovals = $this->getJson("/api/expenses/{$expenseId}")->json('expense.approvals');
+
+        foreach (array_slice($expenseApprovals, 0, 2) as $expenseApproval) {
             $this->patchJson("/api/expenses/{$expenseId}/approve", [
-                'approver_id' => $approverId,
-            ]);
+                'approver_id' => $expenseApproval['approver_id'],
+            ])->assertOk();
         }
 
         $expense = $this->getJson("/api/expenses/{$expenseId}")->json('expense');
+
+        info('expense', [$expense]);
         $this->assertEquals($statusId, $expense['status_id']);
+        $this->assertNotEquals($statusId, $expense['approvals'][0]['status_id']);
+        $this->assertNotEquals($statusId, $expense['approvals'][1]['status_id']);
+        $this->assertEquals($statusId, $expense['approvals'][2]['status_id']);
     }
 
     public function test_only_one_approver_approved_from_three_approvals(): void
     {
-        $statusId = (new StatusRepository)->getByName(name: StatusEnum::DISETUJUI->value)->id;
-        $approverIds = $this->createApprovers(3);
-        $expenseId = $this->createExpense();
-        $this->createApprovals($approverIds);
+        $statusId = (new StatusRepository)->getByName(name: StatusEnum::MENUNGGU_PERSETUJUAN->value)->id;
+        $this->createApprovers(3);
 
-        $this->patchJson("/api/expenses/{$expenseId}/approve", [
-            'approver_id' => $approverIds[0],
-        ]);
+        $expenseId = $this->createExpense();
+        $expenseApprovals = $this->getJson("/api/expenses/{$expenseId}")->json('expense.approvals');
+
+        foreach (array_slice($expenseApprovals, 0, 1) as $expenseApproval) {
+            $this->patchJson("/api/expenses/{$expenseId}/approve", [
+                'approver_id' => $expenseApproval['approver_id'],
+            ])->assertOk();
+        }
 
         $expense = $this->getJson("/api/expenses/{$expenseId}")->json('expense');
-        $this->assertNotEquals($statusId, $expense['status_id']);
+
+        $this->assertEquals($statusId, $expense['status_id']);
+        $this->assertNotEquals($statusId, $expense['approvals'][0]['status_id']);
+        $this->assertEquals($statusId, $expense['approvals'][1]['status_id']);
+        $this->assertEquals($statusId, $expense['approvals'][2]['status_id']);
     }
 
     public function test_all_approver_not_approved_from_three_approvals(): void
@@ -228,5 +248,8 @@ class ExpenseTest extends TestCase
 
         $expense = $this->getJson("/api/expenses/{$expenseId}")->json('expense');
         $this->assertEquals($statusId, $expense['status_id']);
+        $this->assertEquals($statusId, $expense['approvals'][0]['status_id']);
+        $this->assertEquals($statusId, $expense['approvals'][1]['status_id']);
+        $this->assertEquals($statusId, $expense['approvals'][2]['status_id']);
     }
 }
