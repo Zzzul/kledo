@@ -71,6 +71,17 @@ class ExpenseTest extends TestCase
         $this->assertDatabaseHas(table: 'expenses', data: $payload);
     }
 
+    public function test_expense_amount_is_required(): void
+    {
+        $payload = [
+            'amount' => null,
+        ];
+
+        $this->postJson(uri: '/api/expenses', data: $payload)
+            ->assertStatus(status: Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['amount']);
+    }
+
     public function test_can_update_expense(): void
     {
         $expense = $this->createExpenseThroughApi();
@@ -117,11 +128,13 @@ class ExpenseTest extends TestCase
             'amount' => -1,
         ];
 
-        $response = $this->postJson(uri: '/api/expenses', data: $payload);
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)->assertJsonValidationErrors(['amount']);
+        $this->postJson(uri: '/api/expenses', data: $payload)
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['amount']);
 
-        $response = $this->postJson(uri: '/api/expenses', data: $payload2);
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)->assertJsonValidationErrors(['amount']);
+        $this->postJson(uri: '/api/expenses', data: $payload2)
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['amount']);
     }
 
     public function test_amount_cant_be_string()
@@ -130,8 +143,9 @@ class ExpenseTest extends TestCase
             'amount' => 'string',
         ];
 
-        $response = $this->postJson(uri: '/api/expenses', data: $payload);
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)->assertJsonValidationErrors(['amount']);
+        $this->postJson(uri: '/api/expenses', data: $payload)
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['amount']);
     }
 
     protected function createStatus(string $name): int
@@ -157,8 +171,6 @@ class ExpenseTest extends TestCase
         $response = $this->postJson('/api/expenses', [
             'amount' => 10000,
         ]);
-
-        info('expense.id', $response->json('expense'));
 
         return $response->json('expense.id');
     }
@@ -210,7 +222,6 @@ class ExpenseTest extends TestCase
 
         $expense = $this->getJson("/api/expenses/{$expenseId}")->json('expense');
 
-        info('expense', [$expense]);
         $this->assertEquals($statusId, $expense['status_id']);
         $this->assertNotEquals($statusId, $expense['approvals'][0]['status_id']);
         $this->assertNotEquals($statusId, $expense['approvals'][1]['status_id']);
@@ -251,5 +262,55 @@ class ExpenseTest extends TestCase
         $this->assertEquals($statusId, $expense['approvals'][0]['status_id']);
         $this->assertEquals($statusId, $expense['approvals'][1]['status_id']);
         $this->assertEquals($statusId, $expense['approvals'][2]['status_id']);
+    }
+
+    public function test_cant_approve_expense_before_previous_approvals_are_approved(): void
+    {
+        $statusId = (new StatusRepository)->getByName(name: StatusEnum::MENUNGGU_PERSETUJUAN->value)->id;
+        $this->createApprovers(3);
+
+        $expenseId = $this->createExpense();
+        $expenseApprovals = $this->getJson("/api/expenses/{$expenseId}")->json('expense.approvals');
+
+        $this->patchJson("/api/expenses/{$expenseId}/approve", [
+            'approver_id' => $expenseApprovals[0]['approver_id'],
+        ])->assertOk();
+
+        $this->patchJson("/api/expenses/{$expenseId}/approve", [
+            'approver_id' => $expenseApprovals[2]['approver_id'],
+        ])->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        $expense = $this->getJson("/api/expenses/{$expenseId}")->json('expense');
+
+        $this->assertEquals($statusId, $expense['status_id']);
+        $this->assertNotEquals($statusId, $expense['approvals'][0]['status_id']);
+        $this->assertEquals($statusId, $expense['approvals'][1]['status_id']);
+        $this->assertEquals($statusId, $expense['approvals'][2]['status_id']);
+    }
+
+    public function test_expense_approval_approver_id_is_required(): void
+    {
+        $this->createApprovers(3);
+
+        $expenseId = $this->createExpense();
+
+        $this->patchJson("/api/expenses/{$expenseId}/approve", [
+            'approver_id' => null,
+        ])
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['approver_id']);
+    }
+
+    public function test_expense_approval_approver_id_is_must_be_exist_in_database(): void
+    {
+        $this->createApprovers(3);
+
+        $expenseId = $this->createExpense();
+
+        $this->patchJson("/api/expenses/{$expenseId}/approve", [
+            'approver_id' => 9999,
+        ])
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['approver_id']);
     }
 }

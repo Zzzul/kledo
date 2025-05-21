@@ -101,4 +101,15 @@ class ApprovalStageTest extends TestCase
         $response = $this->putJson(uri: '/api/approval-stages/1', data: ['approver_id' => 1]);
         $response->assertStatus(status: Response::HTTP_UNPROCESSABLE_ENTITY);
     }
+
+    public function test_approval_stages_approved_id_is_required(): void
+    {
+        $payload = [
+            'approver_id' => null,
+        ];
+
+        $this->postJson(uri: '/api/approval-stages', data: $payload)
+            ->assertStatus(status: Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['approver_id']);
+    }
 }

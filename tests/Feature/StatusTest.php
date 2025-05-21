@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\StatusEnum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
 class StatusTest extends TestCase
@@ -62,5 +63,38 @@ class StatusTest extends TestCase
         $response->assertOk()->assertJson(['status' => null, 'message' => 'Status deleted successfully']);
 
         $this->assertDatabaseMissing(table: 'statuses', data: ['id' => $status['id']]);
+    }
+
+    public function test_status_name_is_required(): void
+    {
+        $payload = [
+            'name' => null,
+        ];
+
+        $this->postJson(uri: '/api/statuses', data: $payload)
+            ->assertStatus(status: Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['name']);
+    }
+
+    public function test_status_name_cant_more_than_255(): void
+    {
+        $payload = [
+            'name' => str()->random(256),
+        ];
+
+        $this->postJson(uri: '/api/statuses', data: $payload)
+            ->assertStatus(status: Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['name']);
+    }
+
+    public function test_status_name_must_be_in_enum_status(): void
+    {
+        $payload = [
+            'name' => str()->random(),
+        ];
+
+        $this->postJson(uri: '/api/statuses', data: $payload)
+            ->assertStatus(status: Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['name']);
     }
 }
