@@ -79,4 +79,26 @@ class ApproverTest extends TestCase
         $response = $this->putJson(uri: "/api/approvers/{$approver['id']}", data: ['name' => 'Ani']);
         $response->assertStatus(status: Response::HTTP_UNPROCESSABLE_ENTITY);
     }
+
+    public function test_approver_name_is_required(): void
+    {
+        $payload = [
+            'name' => null,
+        ];
+
+        $this->postJson(uri: '/api/approvers', data: $payload)
+            ->assertStatus(status: Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['name']);
+    }
+
+    public function test_approver_name_cant_more_than_255(): void
+    {
+        $payload = [
+            'name' => str()->random(256),
+        ];
+
+        $this->postJson(uri: '/api/approvers', data: $payload)
+            ->assertStatus(status: Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['name']);
+    }
 }
